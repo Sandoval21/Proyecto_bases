@@ -1,1 +1,220 @@
+ Verifique la existencia de las tablas y describa la estructura de cada una.
+∙ Cargue la información del archivo misdatos.sql.
+∙ Realice las consultas necesarias para obtener las siguiente información de la base de datos
 
+1)Listado de empleados: Identificación, nombres y apellidos en una sola columna, fecha de nacimiento, lugar de nacimiento y salario. Los datos deben estar ordenados por la identificación.
+
+SELECT IDENTIFICACION, NOMBRE_1||' '||NOMBRE_2||' '||APELLIDO_1||' '|| APELLIDO_2 AS NOMBRE_COMPLETO, FECHA_N, LUGAR_N, SALARIO FROM EMPLEADOS ORDER BY IDENTIFICACION
+
+
+2)Listado de empleados: Identificación, nombres y apellidos, cargo y fecha ingreso. Los datos deben estar ordenados por la identificación y la fecha de ingreso de forma descendente
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '|| M.APELLIDO_2 AS NOMBRE_COMPLETO, HL.FECHA_INGRESO, C.CARGO
+FROM EMPLEADOS M, HISTORIAL_LABORAL HL, CARGOS C 
+WHERE M.IDENTIFICACION=HL.EMPLEADO AND HL.CARGO=C.COD_CARGO
+ORDER BY M.IDENTIFICACION DESC, HL.FECHA_INGRESO DESC
+
+
+3)Listado de cargos
+
+
+SELECT CARGO FROM CARGOS
+
+
+4) Listado de cargos que actualmente están asignados
+
+
+SELECT DISTINCT C.CARGO FROM EMPLEADOS M , HISTORIAL_LABORAL HL , CARGOS C 
+WHERE M.IDENTIFICACION=HL.EMPLEADO AND HL.CARGO=C.COD_CARGO AND HL.ACTUAL='S'
+
+5)Listado de cargos que actualmente están asignados y la cantidad de empleados que lo tienen asignado
+
+SELECT DISTINCT COUNT(M.IDENTIFICACION), C.CARGO FROM EMPLEADOS M , HISTORIAL_LABORAL HL , CARGOS C 
+WHERE M.IDENTIFICACION=HL.EMPLEADO AND HL.CARGO=C.COD_CARGO AND HL.ACTUAL='S'
+GROUP BY C.CARGO
+
+6)Historial laboral de cada empleado ordenado por empleado y la fecha de ingreso, debe incluir el nombre completo del empleado y la identificación
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '|| M.APELLIDO_1||' '|| M.APELLIDO_2 AS NOMBRE_COMPLETO,HL.FECHA_INGRESO,HL.FECHA_SALIDA, HL.CARGO,HL.ACTUAL 
+FROM EMPLEADOS M, HISTORIAL_LABORAL HL
+WHERE M.IDENTIFICACION=HL.EMPLEADO 
+ORDER BY M.IDENTIFICACION, HL.FECHA_INGRESO
+
+
+7)Listado de cargos que comiencen por la palabra “TECNICO”.
+
+SELECT CARGO FROM CARGOS WHERE CARGO LIKE 'TECNICO%'
+
+
+
+8)Listado de cargos que comiencen por la palabra “AUXILIAR”
+
+SELECT CARGO FROM CARGOS WHERE CARGO LIKE 'AUXILIAR%'
+
+9)Listado de cargos que contenga las letras “ADSL”. 
+
+SELECT CARGO FROM CARGOS WHERE CARGO LIKE '%ADSL%'
+
+10)Listados de los empleados cuya fecha de salida sea nula, debe incluir el nombre completo del empleado y la identificación
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '|| M.APELLIDO_1||' '|| M.APELLIDO_2 AS NOMBRE_COMPLETO,HL.FECHA_SALIDA
+FROM EMPLEADOS M, HISTORIAL_LABORAL HL 
+WHERE M.IDENTIFICACION=HL.EMPLEADO AND HL.FECHA_SALIDA IS NULL
+
+
+11. Elementos asignados a cada empleado que estén vigentes (actual=’S’), debe incluir el nombre completo del empleado, la identificación y el nombre del elemento asignado. Ordenar los resultados por identificación y elemento de forma ascendente.
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO,E.ELEMENTO
+FROM EMPLEADOS M, ELEMENTOS_ASIGNADOS A , ELEMENTOS E
+WHERE M.IDENTIFICACION=A.EMPLEADO AND A.ELEMENTO=E.CODIGO AND A.ACTUAL='S'
+ORDER BY M.IDENTIFICACION ASC ,E.ELEMENTO ASC 
+
+
+12. Historial de elementos asignados a cada empleado, debe incluir el nombre completo del
+empleado, la identificación, el nombre del elemento asignado, cantidad, duración y talla (es el campo numero). Ordenar los resultados por identificación y elemento de forma ascendente.
+
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO,E.ELEMENTO,A.CANTIDAD,A.DURACION,A.NUMERO AS TALLA
+FROM EMPLEADOS M , ELEMENTOS_ASIGNADOS A, ELEMENTOS E 
+WHERE M.IDENTIFICACION=A.EMPLEADO and A.ELEMENTO=E.CODIGO
+ORDER BY M.IDENTIFICACION ASC , A.ELEMENTO ASC
+
+
+
+13. Entregas realiza, la cual debe incluir: el Id de entrega, el empleado, el elemento y la fecha de entrega, el listado debe estar ordenado por la fecha de entrega de forma descendente.
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO, EN.ID_ENTREGA,E.ELEMENTO,EN.FECHA 
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO and EN.ELEMENTO=E.CODIGO
+ORDER BY EN.FECHA DESC
+
+
+
+14.Elementos entregados a cada trabajador.
+
+
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO,E.ELEMENTO 
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO and EN.ELEMENTO=E.CODIGO
+ORDER BY EN.FECHA DESC
+
+
+15. Total de elementos entregados a cada trabajador, agrupados por elemento.
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO, COUNT(EN.ELEMENTO) ,E.ELEMENTO
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO and EN.ELEMENTO=E.CODIGO 
+GROUP BY E.ELEMENTO,M.IDENTIFICACION, M.NOMBRE_1,M.NOMBRE_2,M.APELLIDO_1,M.APELLIDO_2 
+
+16. Total elementos entregados, agrupados por elementos.
+
+
+SELECT  COUNT(EN.ELEMENTO) ,E.ELEMENTO
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO and EN.ELEMENTO=E.CODIGO 
+GROUP BY E.ELEMENTO
+
+17. Ficha técnica de cada elemento, ordenado por el nombre del elemento en orden ascendente.
+
+SELECT  ELEMENTO, TALLA, USO, MATERIALES, MANTENIMIENTO, USOS, NORMA, ATENUACION, SERIAL, TALLAS,UNIDAD, RUTA 
+FROM ELEMENTOS 
+ORDER BY ELEMENTO ASC
+
+18. Listado de empleados y los elementos que les están pendientes por entregar.
+
+SELECT M.IDENTIFICACION, M.NOMBRE_1||' '||M.NOMBRE_2||' '||M.APELLIDO_1||' '||M.APELLIDO_2 AS NOMBRE_COMPLETO,EN.VIGENTE, E.ELEMENTO
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO AND EN.ELEMENTO=E.CODIGO AND EN.VIGENTE='N'
+
+19. El elemento más solicitado.
+
+SELECT  COUNT(EN.ELEMENTO)AS CANTIDAD ,E.ELEMENTO
+FROM EMPLEADOS M, ENTREGA_ELEMENTOS EN, ELEMENTOS E
+WHERE M.IDENTIFICACION=EN.EMPLEADO and EN.ELEMENTO=E.CODIGO 
+GROUP BY E.ELEMENTO
+HAVING COUNT(EN.ELEMENTO)=(SELECT MAX(TOTAL) 
+                           FROM (
+                           SELECT COUNT (EN.ELEMENTO)AS TOTAL
+                           FROM ENTREGA_ELEMENTOS EN 
+                           GROUP BY EN.ELEMENTO));
+
+
+20. Listado de elementos entregados y la cantidad, durante el segundo periodo del año 2009
+
+
+SELECT E.ELEMENTO, COUNT(EN.ELEMENTO) AS TOTAL_ENTREGAS, EN.VIGENTE 
+FROM ENTREGA_ELEMENTOS EN, ELEMENTOS E 
+WHERE EN.ELEMENTO = E.CODIGO 
+AND EN.VIGENTE = 'S'
+AND EN.FECHA BETWEEN ('01/06/2009') AND ('31/12/2009')
+GROUP BY E.ELEMENTO, EN.VIGENTE;
+
+
+2. Cree la siguiente tabla e inserte en ella los datos de la tabla empleado utilizando
+para ello la instrucción insert into mitabla_destino (select * from mitabla_origen);
+
+
+insert into tmp_empleados(select * from empleados);
+
+
+3. Cree la siguiente tabla e inserte en ella los datos requeridos, utilizando para ello la
+instrucción insert into mitabla_destino (select * from mitabla_origen); .
+
+INSERT INTO TMP_INFORME (
+SELECT
+M.IDENTIFICACION, M.TIPO, M.NOMBRE_1 || ' ' || M.NOMBRE_2 || ' ' ||
+M.APELLIDO_1 || ' ' || M.APELLIDO_2 AS EMPLEADO,
+C.CARGO,HL.FECHA_INGRESO,(NVL(HL.FECHA_SALIDA, SYSDATE) -
+HL.FECHA_INGRESO) AS TIEMPO_EN_CARGO, M.SALARIO
+FROM EMPLEADOS M, HISTORIAL_LABORAL HL, CARGOS C
+WHERE M.IDENTIFICACION=HL.EMPLEADO AND HL.CARGO=C.COD_CARGO
+)
+
+
+4.Escriba la instrucción sql necesaria para eliminar los datos de los empleados de la tabla
+TMP_INFORME Donde el cargo sea igual a “SUPERVISOR TELEFONIA PUBLICA”
+
+DELETE FROM TMP_INFORME
+WHERE CARGO = 'SUPERVISOR TELEFONIA PUBLICA'
+
+
+5.Escriba la instrucción sql necesaria para actualizar la columna serial de la tabla elementos
+con el valor “S”.
+
+UPDATE ELEMENTOS SET SERIAL='S'
+
+6.Escriba las instrucciones sql necesarias para actualizar la columna email de la tabla
+empleados con la nueva dirección de correo asignada por la empresa. La nueva dirección
+asignada debe estar conformada por: La inicial del primer nombre + el primer apellido + el
+segundo apellido + unillanos.edu.co, esta actualización debe hacerla a los empleados con
+identificación 86072892, 82787309 y 46762330. Ejemplo: Ricardo Andrés Sandoval Morales
+-> rsandovalmorales@unillanos.edu.co
+
+UPDATE EMPLEADOS
+SET EMAIL = LOWER(SUBSTR(NOMBRE_1, 1, 1) || APELLIDO_1 || APELLIDO_2 ||'@unillanos.edu.co')
+WHERE IDENTIFICACION IN (86072892, 82787309, 46762330);
+
+
+7. Al ejecutar instrucciones sql de tipo DDL o DML, para qué caso debo confirmar una
+transacción (commit), de tal forma que los cambios sean permanentes. 🡪 Para instrucciones
+de tipo DDL 🡪 Para instrucciones de tipo DML Explique el porqué de su respuesta e indique
+algunas instrucciones sobre las cuales debo confirmar las transacciones
+
+Instrucciones DDL:
+
+Estas son las que usamos para crear y modificar la estructura de la base de datos. Por
+ejemplo, cuando usamos CREATE, ALTER o DROP. En este caso no necesitamos hacer un
+COMMIT después de ejecutar estas instrucciones, porque las instrucciones DDL se
+confirman automáticamente. Eso significa que cuando creamos una tabla, esa tabla queda
+guardada al instante y no hay forma de deshacer a menos que la eliminemos.
+
+Instrucciones DML:
+
+Empezamos a trabajar con los datos de la base de datos, usando instrucciones como
+INSERT, UPDATE y DELETE. A diferencia de las instrucciones DDL, cuando hacemos
+cambios con DML, sí tenemos que usar COMMIT para que esos cambios sean
+permanentes. En tal caso que no hagamos un COMMIT, los cambios quedan en una
+especie de estar y no estar, aunque al terminar todo podemos resolverlo con un
+ROLLBACK. Si añadimos un nuevo empleado a la tabla con INSERT, ese nuevo registro no
+se guardará hasta que hagamos el COMMIT.
